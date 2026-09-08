@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Fluent;
 
-class Testimonial extends Model
+/**
+ * Testimoni pelanggan, dibaca dari config/content.php.
+ */
+class Testimonial
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'customer_name',
-        'location',
-        'content',
-        'rating',
-        'service_used',
-    ];
+    /**
+     * @return Collection<int, Fluent>
+     */
+    public static function all(): Collection
+    {
+        return collect(config('content.testimonials'))
+            ->map(fn (array $testimonial): Fluent => new Fluent($testimonial))
+            ->values();
+    }
 }

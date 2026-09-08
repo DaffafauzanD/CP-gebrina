@@ -7,15 +7,11 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Situs ini tidak memakai database untuk kontennya. Seluruh layanan,
+     * galeri, dan testimoni dibaca dari config/content.php.
      */
     public function run(): void
     {
-        $this->call([
-            ServiceSeeder::class,
-            ServiceAreaSeeder::class,
-            GallerySeeder::class,
-            TestimonialSeeder::class,
-        ]);
+        //
     }
 }
