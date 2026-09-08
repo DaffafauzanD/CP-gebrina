@@ -3,6 +3,13 @@
 @section('title', 'Tentang Kami - CV GEBRINA JAYA | Profil & Legalitas Usaha')
 @section('meta_description', 'Profil lengkap CV GEBRINA JAYA, penyedia jasa sedot WC & sanitasi profesional terpercaya di Jabodetabek sejak 2011 dengan NIB dan izin resmi pembuangan limbah LH.')
 
+@section('schema_json')
+    @include('components.schema.breadcrumbs', ['items' => [
+        ['name' => 'Beranda', 'url' => route('home')],
+        ['name' => 'Tentang Kami', 'url' => route('about')],
+    ]])
+@endsection
+
 @section('content')
 
 <!-- PAGE HEADER -->
@@ -27,11 +34,9 @@
                 </h2>
                 <p class="text-slate-600 leading-relaxed text-sm sm:text-base">
                     <strong>CV GEBRINA JAYA</strong> didirikan dengan komitmen murni untuk mengatasi permasalahan sanitasi masyarakat perkotaan Jabodetabek yang kian berkembang pesat. Berawal dari 2 unit armada truk sederhana, kini kami berkembang menjadi penyedia jasa spesialis dengan puluhan unit truk tangki vakum berkapasitas besar dan teknisi berpengalaman.
+                    Kami memprioritaskan metode kerja yang higienis, ramah lingkungan, cepat tanggap, dan profesional.
                 </p>
-                <p class="text-slate-600 leading-relaxed text-sm sm:text-base">
-                    Kami memprioritaskan metode kerja yang higienis, ramah lingkungan, cepat tanggap, dan profesional. Seluruh limbah yang ditarik dibuang secara legal ke Tempat Pembuangan Limbah Resmi (IPLT) milik pemerintah daerah.
-                </p>
-
+                
                 <div class="grid grid-cols-2 gap-4 pt-2">
                     <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
                         <div class="text-2xl font-extrabold text-blue-600">15+ Tahun</div>
@@ -46,7 +51,7 @@
 
             <div class="lg:col-span-6">
                 <div class="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-100">
-                    <img src="{{ asset('images/gallery/tim-teknisi-1.jpg') }}" alt="Tim Teknisi CV GEBRINA JAYA" class="w-full h-[400px] object-cover">
+                    @include('components.picture', ['src' => 'images/gallery/tim-teknisi-1.jpg', 'alt' => 'Tim Teknisi CV GEBRINA JAYA', 'class' => 'w-full h-[400px] object-cover'])
                 </div>
             </div>
 
@@ -87,7 +92,7 @@
 </section>
 
 <!-- LEGALITIES & PROOF OF QUALITY -->
-<section class="py-16 bg-white">
+<!-- <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-slate-900 rounded-3xl p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
             <div class="relative z-10 max-w-3xl space-y-6">
@@ -117,6 +122,6 @@
             </div>
         </div>
     </div>
-</section>
+</section> -->
 
 @endsection

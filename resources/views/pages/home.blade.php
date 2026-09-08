@@ -1,54 +1,7 @@
 @extends('layouts.app')
 
 @section('title', config('company.name') . ' - Jasa Sedot WC & Septic Tank Jabodetabek 24 Jam')
-
-@section('schema_json')
-<script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "{{ config('company.name') }}",
-  "image": "{{ asset('images/hero-truck.jpg') }}",
-  "@id": "{{ url('/') }}",
-  "url": "{{ url('/') }}",
-  "telephone": "{{ config('company.contact.phone_raw') }}",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Jl. Raya Bogor KM 26 No. 88, Ciracas",
-    "addressLocality": "Jakarta Timur",
-    "addressRegion": "DKI Jakarta",
-    "postalCode": "13740",
-    "addressCountry": "ID"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": -6.310931,
-    "longitude": 106.876678
-  },
-  "openingHoursSpecification": {
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday"
-    ],
-    "opens": "00:00",
-    "closes": "23:59"
-  },
-  "areaServed": [
-    "Jakarta", "Bogor", "Depok", "Tangerang", "Bekasi"
-  ],
-  "sameAs": [
-    "{{ config('company.socials.facebook') }}",
-    "{{ config('company.socials.instagram') }}"
-  ]
-}
-</script>
-@endsection
+@section('meta_description', 'Jasa sedot WC, kuras septic tank, dan pelancaran saluran mampet 24 jam di Jabodetabek. Armada truk vakum, selang 100+ meter, pengerjaan bergaransi. Hubungi CV GEBRINA JAYA sekarang.')
 
 @section('content')
 
@@ -110,7 +63,7 @@
             <!-- Right Hero Card / Image -->
             <div class="lg:col-span-5 relative">
                 <div class="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-slate-700/60 group">
-                    <img src="{{ asset('images/hero-truck.jpg') }}" alt="Truk Vakum Sedot WC CV Gebrina Jaya" loading="lazy" class="w-full h-[380px] sm:h-[450px] object-cover group-hover:scale-105 transition-transform duration-500">
+                    @include('components.picture', ['src' => 'images/hero-truck.jpg', 'alt' => 'Truk Vakum Sedot WC CV Gebrina Jaya', 'class' => 'w-full h-[380px] sm:h-[450px] object-cover group-hover:scale-105 transition-transform duration-500'])
                     
                     <!-- Floating Overlay Card -->
                     <div class="absolute bottom-4 left-4 right-4 bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-slate-700 text-white space-y-1">
@@ -180,7 +133,7 @@
             @foreach($services->take(3) as $service)
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200 flex flex-col hover:shadow-2xl transition-all duration-300 group">
                     <div class="relative h-48 overflow-hidden">
-                        <img src="{{ asset($service->image_path ?? 'images/services/service-sedot-wc.jpg') }}" alt="{{ $service->name }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        @include('components.picture', ['src' => $service->image_path ?? 'images/services/service-sedot-wc.jpg', 'alt' => $service->name, 'loading' => 'lazy', 'class' => 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'])
                     </div>
                     <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
                         <div>
@@ -218,7 +171,7 @@
         </div>
 
         <div class="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center">
-            @foreach(['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'] as $cityName)
+            @foreach(config('company.service_areas') as $cityName)
                 <a href="{{ route('areas') }}" class="bg-slate-800/80 hover:bg-blue-600 p-5 rounded-2xl border border-slate-700 hover:border-blue-400 transition-all duration-300 group">
                     <div class="w-10 h-10 rounded-full bg-blue-900/80 text-amber-400 flex items-center justify-center mx-auto mb-3 group-hover:bg-white group-hover:text-blue-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>

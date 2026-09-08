@@ -11,7 +11,7 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
 
 Route::get('/layanan', [ServiceController::class, 'index'])->name('services.index');
-Route::get('/layanan/{service:slug}', [ServiceController::class, 'show'])->name('services.show');
+Route::get('/layanan/{slug}', [ServiceController::class, 'show'])->name('services.show');
 
 Route::get('/wilayah-layanan', [PageController::class, 'areas'])->name('areas');
 Route::get('/galeri', [PageController::class, 'gallery'])->name('gallery');

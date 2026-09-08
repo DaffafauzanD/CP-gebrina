@@ -3,6 +3,13 @@
 @section('title', 'Layanan Sedot WC & Septic Tank - CV GEBRINA JAYA')
 @section('meta_description', 'Daftar lengkap layanan CV GEBRINA JAYA: Sedot WC Rumahan, Sedot WC Perkantoran, Pelancaran Saluran Mampet Tanpa Bongkar, Pembuatan Septic Tank Baru & Kuras Limbah Restoran.')
 
+@section('schema_json')
+    @include('components.schema.breadcrumbs', ['items' => [
+        ['name' => 'Beranda', 'url' => route('home')],
+        ['name' => 'Layanan', 'url' => route('services.index')],
+    ]])
+@endsection
+
 @section('content')
 
 <!-- PAGE HEADER -->
@@ -24,7 +31,7 @@
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200 flex flex-col justify-between hover:shadow-2xl transition-all duration-300 group">
                     <div>
                         <div class="relative h-52 overflow-hidden">
-                            <img src="{{ asset($service->image_path ?? 'images/services/service-sedot-wc.jpg') }}" alt="{{ $service->name }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            @include('components.picture', ['src' => $service->image_path ?? 'images/services/service-sedot-wc.jpg', 'alt' => $service->name, 'loading' => 'lazy', 'class' => 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'])
                         </div>
 
                         <div class="p-6 space-y-4">

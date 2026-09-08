@@ -3,32 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    
-    <title>@yield('title', config('company.name') . ' - ' . config('company.tagline'))</title>
-    <meta name="description" content="@yield('meta_description', config('company.description'))">
-    <meta name="keywords" content="sedot wc jakarta, sedot wc bogor, sedot wc depok, sedot wc tangerang, sedot wc bekasi, sedot septic tank jabodetabek, pelancaran saluran mampet, gebrina jaya">
-    <meta name="author" content="CV GEBRINA JAYA">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="{{ url()->current() }}">
 
-    <!-- Open Graph / Facebook / WhatsApp -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('title', config('company.name'))">
-    <meta property="og:description" content="@yield('meta_description', config('company.description'))">
-    <meta property="og:image" content="@yield('og_image', asset('images/hero-truck.jpg'))">
-    <meta property="og:site_name" content="CV GEBRINA JAYA">
-    <meta property="og:locale" content="id_ID">
+    @include('components.seo')
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Structured Data -->
+    @include('components.schema.local-business')
     @yield('schema_json')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])

@@ -3,6 +3,13 @@
 @section('title', 'Wilayah Layanan Sedot WC Jabodetabek - CV GEBRINA JAYA')
 @section('meta_description', 'Jangkauan wilayah layanan CV GEBRINA JAYA di seluruh kawasan Jabodetabek: Jakarta, Bogor, Depok, Tangerang, dan Bekasi. Melayani 24 Jam Nonstop dengan armada tangki terdekat.')
 
+@section('schema_json')
+    @include('components.schema.breadcrumbs', ['items' => [
+        ['name' => 'Beranda', 'url' => route('home')],
+        ['name' => 'Wilayah Layanan', 'url' => route('areas')],
+    ]])
+@endsection
+
 @section('content')
 
 <!-- PAGE HEADER -->
@@ -21,7 +28,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach(['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'] as $region)
+            @foreach(config('company.service_areas') as $region)
                 <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 space-y-4 hover:shadow-xl transition-shadow">
                     <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
                         <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">

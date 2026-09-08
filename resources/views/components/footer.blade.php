@@ -80,7 +80,7 @@
             <div class="flex items-center space-x-4">
                 <span>{{ config('company.legalities.nib') }}</span>
                 <span>•</span>
-                <span>Pembuangan Resmi IPLT LH</span>
+                <!-- <span>Pembuangan Resmi IPLT LH</span> -->
             </div>
         </div>
     </div>

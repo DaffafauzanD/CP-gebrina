@@ -2,6 +2,17 @@
 
 @section('title', $service->name . ' - CV GEBRINA JAYA Jabodetabek')
 @section('meta_description', $service->short_description)
+@section('og_image', asset($service->image_path ?? 'images/services/service-sedot-wc.jpg'))
+@section('og_image_alt', $service->name)
+
+@section('schema_json')
+    @include('components.schema.breadcrumbs', ['items' => [
+        ['name' => 'Beranda', 'url' => route('home')],
+        ['name' => 'Layanan', 'url' => route('services.index')],
+        ['name' => $service->name, 'url' => route('services.show', $service->slug)],
+    ]])
+    @include('components.schema.service')
+@endsection
 
 @section('content')
 
@@ -36,7 +47,7 @@
             <div class="lg:col-span-8 space-y-8">
                 
                 <div class="rounded-2xl overflow-hidden shadow-xl border border-slate-200">
-                    <img src="{{ asset($service->image_path ?? 'images/services/service-sedot-wc.jpg') }}" alt="{{ $service->name }}" class="w-full h-[360px] sm:h-[450px] object-cover">
+                    @include('components.picture', ['src' => $service->image_path ?? 'images/services/service-sedot-wc.jpg', 'alt' => $service->name, 'class' => 'w-full h-[360px] sm:h-[450px] object-cover'])
                 </div>
 
                 <div class="prose prose-slate max-w-none space-y-4">
