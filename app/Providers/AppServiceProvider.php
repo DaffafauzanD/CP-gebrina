@@ -25,8 +25,14 @@ class AppServiceProvider extends ServiceProvider
          * dan baris Sitemap di robots.txt) wajib https. Paksa scheme-nya supaya
          * tetap benar walau SSL diterminasi di proxy/CDN yang tidak meneruskan
          * header X-Forwarded-Proto.
+         *
+         * Root URL juga dikunci ke APP_URL (versi www) supaya canonical dan
+         * sitemap tidak mengikuti host yang diakses pengunjung. Tanpa ini,
+         * cvgebrinajaya.com dan www.cvgebrinajaya.com sama-sama mengaku
+         * kanonis dan Google menandainya sebagai duplikat.
          */
         if ($this->app->isProduction()) {
+            URL::forceRootUrl(config('app.url'));
             URL::forceScheme('https');
         }
     }

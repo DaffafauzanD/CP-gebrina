@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Service;
+use App\Providers\AppServiceProvider;
 use Tests\TestCase;
 
 class SeoTest extends TestCase
@@ -25,6 +26,23 @@ class SeoTest extends TestCase
         $response->assertOk();
         $response->assertSee('Allow: /', false);
         $response->assertSee('Sitemap: '.route('sitemap'), false);
+    }
+
+    public function test_canonical_and_sitemap_urls_use_app_url_host_regardless_of_requested_host_in_production(): void
+    {
+        config(['app.url' => 'https://www.cvgebrinajaya.com']);
+        $this->app->detectEnvironment(fn (): string => 'production');
+        (new AppServiceProvider($this->app))->boot();
+
+        $this->get('https://cvgebrinajaya.com/')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://www.cvgebrinajaya.com">', false)
+            ->assertDontSee('href="https://cvgebrinajaya.com', false);
+
+        $this->get('https://cvgebrinajaya.com/sitemap.xml')
+            ->assertOk()
+            ->assertSee('<loc>https://www.cvgebrinajaya.com/layanan</loc>', false)
+            ->assertDontSee('<loc>https://cvgebrinajaya.com', false);
     }
 
     public function test_sitemap_lists_every_service_detail_page(): void
