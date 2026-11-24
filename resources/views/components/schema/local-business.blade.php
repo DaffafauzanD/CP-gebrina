@@ -13,7 +13,7 @@
         'name' => config('company.name'),
         'description' => config('company.description'),
         'url' => url('/'),
-        'image' => asset('images/hero-truck.jpg'),
+        'image' => \App\Support\VersionedAsset::url('images/hero-truck.jpg'),
         'telephone' => config('company.contact.phone_raw'),
         'email' => config('company.contact.email'),
         'address' => [

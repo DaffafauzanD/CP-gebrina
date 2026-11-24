@@ -12,7 +12,7 @@
     $seoCanonical = $__env->yieldContent('canonical', e(url()->current()));
     $seoRobots = $__env->yieldContent('robots', e('index, follow, max-image-preview:large, max-snippet:-1'));
     $seoOgType = $__env->yieldContent('og_type', e('website'));
-    $seoOgImage = $__env->yieldContent('og_image', e(asset('images/hero-truck.jpg')));
+    $seoOgImage = $__env->yieldContent('og_image', e(\App\Support\VersionedAsset::url('images/hero-truck.jpg')));
     $seoOgImageAlt = $__env->yieldContent('og_image_alt', e(config('company.name')));
 @endphp
 
@@ -23,7 +23,7 @@
 <link rel="canonical" href="{!! $seoCanonical !!}">
 
 <!-- Open Graph / Facebook / WhatsApp -->
-<meta property="og:site_name" content="{{ config('company.name') }}">
+<meta property="og:site_name" content="{{ config('company.site_name') }}">
 <meta property="og:locale" content="id_ID">
 <meta property="og:type" content="{!! $seoOgType !!}">
 <meta property="og:url" content="{!! $seoCanonical !!}">

@@ -10,7 +10,7 @@
         'serviceType' => $service->name,
         'description' => $service->short_description,
         'url' => route('services.show', $service->slug),
-        'image' => asset($service->image_path ?? 'images/hero-truck.jpg'),
+        'image' => \App\Support\VersionedAsset::url($service->image_path ?? 'images/hero-truck.jpg'),
         'provider' => ['@id' => url('/').'#business'],
         'areaServed' => array_map(
             fn (string $area): array => ['@type' => 'City', 'name' => $area],

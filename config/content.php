@@ -14,18 +14,19 @@ return [
      * Tanggal perubahan konten terakhir, dipakai sebagai <lastmod> di sitemap.
      * Perbarui setiap kali isi berkas ini diubah.
      */
-    'updated_at' => '2026-09-08',
+    'updated_at' => '2026-09-13',
 
     'services' => [
         [
             'name' => 'Sedot WC Rumahan & Perumahan',
             'slug' => 'sedot-wc-rumahan',
+            'seo_title' => 'Jasa Sedot WC Rumahan Jabodetabek 24 Jam | Gebrina Jaya',
             'short_description' => 'Layanan kuras septic tank penuh untuk rumah tinggal, kontrakan, & perumahan dengan truk vakum bertenaga tinggi.',
             'description' => 'Layanan Sedot WC Rumahan dari CV GEBRINA JAYA dirancang khusus untuk mengatasi masalah septic tank penuh pada hunian Anda. Menggunakan armada truk tangki vakum modern berkapasitas besar dan selang hingga 100 meter, kami mampu menjangkau lokasi perkampungan maupun gang sempit tanpa mengganggu kenyamanan tetangga.
 
 Kami menjamin proses kerja yang higienis, bersih, tanpa bau menyengat yang tertinggal, serta tanpa perlu membongkar struktur fisik rumah Anda secara berlebihan.',
             'icon' => 'home',
-            'image_path' => 'images/services/service-sedot-wc.jpg',
+            'image_path' => 'images/gallery/truk-armada-ungu.jpg',
             'features' => [
                 'Selang ekstra panjang hingga 100+ meter',
                 'Proses sedot cepat & tanpa bau menyengat',
@@ -37,12 +38,13 @@ Kami menjamin proses kerja yang higienis, bersih, tanpa bau menyengat yang terti
         [
             'name' => 'Sedot WC Kantor, Ruko & Gedung',
             'slug' => 'sedot-wc-kantor-ruko',
+            'seo_title' => 'Jasa Sedot WC Kantor Jabodetabek 24 Jam | Gebrina Jaya',
             'short_description' => 'Solusi pengurasan septic tank skala besar untuk area komersial, ruko, perkantoran, rumah sakit, & gedung bertingkat.',
             'description' => 'Layanan khusus untuk sektor usaha, kantor, ruko, restoran, dan fasilitas publik. Penanganan septic tank berkapasitas besar membutuhkan armada truk vakum khusus bertekanan tinggi yang siap bekerja di luar jam operasional kantor Anda (malam/akhir pekan) agar tidak mengganggu operasional bisnis.
 
 Tim CV GEBRINA JAYA dibekali APD lengkap dan standar K3 lingkungan yang ketat untuk menjamin keamanan area kerja komersial Anda.',
             'icon' => 'building-office',
-            'image_path' => 'images/services/service-kantor.jpg',
+            'image_path' => 'images/gallery/tim-teknisi-kerja.jpg',
             'features' => [
                 'Melayani pengerjaan malam / luar jam kerja',
                 'Armada kapasitas tangki besar (4000-6000 Liter)',
@@ -54,6 +56,7 @@ Tim CV GEBRINA JAYA dibekali APD lengkap dan standar K3 lingkungan yang ketat un
         [
             'name' => 'Pelancaran Saluran Mampet (Tanpa Bongkar)',
             'slug' => 'pelancaran-saluran-mampet',
+            'seo_title' => 'Jasa Saluran Mampet Jabodetabek Tanpa Bongkar | Gebrina Jaya',
             'short_description' => 'Atasi saluran pipa meluap, wastafel tersumbat, kran mati, atau floor drain mampet dengan teknologi modern tanpa pembongkaran.',
             'description' => 'Saluran pipa tersumbat lemak, sisa makanan, rambut, atau kerak semen? Jangan terburu-buru membongkar keramik lantai Anda! CV GEBRINA JAYA menggunakan mesin *spiral rigid cleaner* canggih dan *high-pressure hydro-jetting* yang mampu menghancurkan sumbatan di dalam saluran pipa PVC tanpa merusak pipa atau struktur bangunan.
 
@@ -71,6 +74,7 @@ Proses pengerjaan cepat (30-60 menit) dan saluran langsung lancar seperti baru k
         [
             'name' => 'Pembuatan & Perbaikan Septic Tank Baru',
             'slug' => 'pembuatan-septic-tank-baru',
+            'seo_title' => 'Jasa Pembuatan Septic Tank Jabodetabek | CV Gebrina Jaya',
             'short_description' => 'Jasa kontraksi pembuatan septic tank kedap air, sistem resapan biopori modern, & perbaikan dinding septic tank retak.',
             'description' => 'Septic tank lama Anda sering penuh meski baru disedot? Itu tandanya resapan air sudah tersumbat lumpur atau terjadi resapan buruk. CV GEBRINA JAYA melayani jasa pembuatan septic tank baru berstandar SNI dengan sistem filter bio-tech atau beton kedap air yang tahan puluhan tahun.
 
@@ -88,6 +92,7 @@ Kami juga melayani renovasi septic tank lama, pembuatan resapan baru, serta pema
         [
             'name' => 'Sedot Limbah Industri & Restoran (Fat Trap)',
             'slug' => 'sedot-limbah-industri-restoran',
+            'seo_title' => 'Sedot Grease Trap Restoran Jabodetabek | CV Gebrina Jaya',
             'short_description' => 'Pengangkutan limbah cair non-B3, lemak olahan makanan (grease trap) restoran, & pengurasan kolam penampungan.',
             'description' => 'Lumpur olahan makanan (grease trap) pada restoran dan cafe jika dibiarkan dapat menimbulkan bau membusuk dan menyumbat saluran utama. CV GEBRINA JAYA menyediakan kontrak perawatan rutin maupun panggilan darurat pengurasan limbah lemak cair dan limbah pabrik non-B3.
 
@@ -115,52 +120,58 @@ Seluruh limbah yang diangkut akan dibuang ke Tempat Pembuangan Limbah Resmi (IPL
 
     'gallery' => [
         [
-            'title' => 'Armada Truk Tangki Vakum Modern CV GEBRINA JAYA',
-            'image_path' => 'images/gallery/truk-armada-1.jpg',
-            'category' => 'armada',
-            'description' => 'Truk tangki vakum kapasitas 5000 Liter siap melayani kawasan Jakarta & sekitarnya.',
-        ],
-        [
-            'title' => 'Penyedotan Septic Tank Perumahan di Kebayoran Baru',
-            'image_path' => 'images/gallery/sedot-wc-rumah-1.jpg',
+            'title' => 'Tim Teknisi CV GEBRINA JAYA Menangani Sedot WC',
+            'image_path' => 'images/gallery/tim-teknisi-kerja.jpg',
             'category' => 'sedot-wc',
-            'description' => 'Proses pengurasan penuh tanpa bongkar keramik dengan selang jangkauan 50 meter.',
+            'description' => 'Petugas berseragam menurunkan selang vakum ke lubang kontrol, dikerjakan rapi tanpa membongkar lantai.',
         ],
         [
-            'title' => 'Pelancaran Pipa Wastafel Mampet Restoran di BSD Tangerang',
+            'title' => 'Armada Truk Tangki Vakum Siaga 24 Jam',
+            'image_path' => 'images/gallery/truk-armada-hitam.jpg',
+            'category' => 'armada',
+            'description' => 'Truk tangki vakum bertekanan tinggi dengan gulungan selang panjang, siap meluncur ke seluruh Jabodetabek.',
+        ],
+        [
+            'title' => 'Unit Truk Tangki Vakum Kapasitas Besar',
+            'image_path' => 'images/gallery/truk-armada-biru.jpg',
+            'category' => 'armada',
+            'description' => 'Armada terawat dengan selang jangkauan jauh untuk menembus gang sempit dan halaman belakang.',
+        ],
+        [
+            'title' => 'Armada Siap Berangkat dari Kantor Bekasi',
+            'image_path' => 'images/gallery/truk-armada-kuning-hitam.jpg',
+            'category' => 'armada',
+            'description' => 'Dua unit truk tangki vakum CV GEBRINA JAYA bersiaga di pool, sudah dicek dan siap berangkat ke lokasi pelanggan.',
+        ],
+        [
+            'title' => 'Tim Menyiapkan Peralatan di Kantor Griya Asri 2',
+            'image_path' => 'images/gallery/tim-persiapan-kantor.jpg',
+            'category' => 'armada',
+            'description' => 'Teknisi berseragam membersihkan selang dan sambungan pipa sebelum bertugas, di kantor kami Griya Asri 2 Blok I, Jl. Siaga 16 No. 62, Sumberjaya, Kabupaten Bekasi.',
+        ],
+        [
+            'title' => 'Pengurasan Septic Tank Penuh Tanpa Bongkar Keramik',
+            'image_path' => 'images/gallery/truk-armada-ungu.jpg',
+            'category' => 'sedot-wc',
+            'description' => 'Truk vakum siap melakukan pengurasan septic tank penuh untuk rumah, ruko, maupun gedung.',
+        ],
+        [
+            'title' => 'Pelancaran Pipa & Wastafel Mampet',
             'image_path' => 'images/gallery/saluran-mampet-1.jpg',
             'category' => 'saluran-mampet',
-            'description' => 'Pembersihan endapan lemak membeku menggunakan mesin spiral roto-cleaner.',
+            'description' => 'Pembersihan endapan lemak membeku menggunakan mesin spiral roto-cleaner, tanpa membongkar pipa.',
         ],
         [
-            'title' => 'Pengurasan Grease Trap & Penampungan Lemak Restoran',
+            'title' => 'Pengurasan Grease Trap & Limbah Restoran',
             'image_path' => 'images/gallery/limbah-restoran-1.jpg',
             'category' => 'limbah-industri',
             'description' => 'Penyedotan limbah cair lemak restoran secara berkala dengan standar higienis.',
         ],
         [
-            'title' => 'Pembuatan Septic Tank Bio-Tech Kedap Air di Depok',
+            'title' => 'Pembuatan Septic Tank Bio-Tech Kedap Air',
             'image_path' => 'images/gallery/septic-tank-baru-1.jpg',
             'category' => 'septic-tank',
-            'description' => 'Konstruksi septic tank biopori ramah lingkungan bebas bau dan tahan bocor.',
-        ],
-        [
-            'title' => 'Tim Teknisi Berpengalaman Siap Bertugas 24/7',
-            'image_path' => 'images/gallery/tim-teknisi-1.jpg',
-            'category' => 'armada',
-            'description' => 'Petugas profesional dibekali seragam dan perlengkapan K3 keselamatan kerja.',
-        ],
-        [
-            'title' => 'Proses Sedot Septic Tank Gedung Perkantoran Cikarang',
-            'image_path' => 'images/gallery/sedot-wc-kantor-1.jpg',
-            'category' => 'sedot-wc',
-            'description' => 'Pengerjaan pengurasan septic tank skala besar pada jam malam di area pabrik.',
-        ],
-        [
-            'title' => 'Pembersihan Saluran Kloset Tersumbat di Perumahan Cibubur',
-            'image_path' => 'images/gallery/saluran-mampet-2.jpg',
-            'category' => 'saluran-mampet',
-            'description' => 'Pelancaran kloset meluap dalam hitungan menit tanpa merusak pipa bawah tanah.',
+            'description' => 'Konstruksi septic tank biopori ramah lingkungan, bebas bau dan tahan bocor.',
         ],
     ],
 

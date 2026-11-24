@@ -1,0 +1,143 @@
+# Deploy otomatis ke Hostinger setiap ada push ke branch main.
+#
+# Alur: jalankan test -> build aset (composer + vite) di GitHub -> upload lewat
+# SSH/rsync -> refresh cache Laravel di server. Server tidak perlu Node/npm.
+#
+# Struktur di server (sama seperti deploy manual sebelumnya):
+#   LARAVEL_PATH  -> kode aplikasi, .env, storage   (mis. /home/u123/domains/cvgebrinajaya.com/laravel)
+#   PUBLIC_PATH   -> folder publik (public_html)     (mis. /home/u123/domains/cvgebrinajaya.com/public_html)
+# public_html/index.php di server versi khusus (menunjuk ke ../laravel), jadi
+# tidak pernah ditimpa oleh public/index.php dari repo.
+#
+# Secrets yang wajib diisi di GitHub > Settings > Secrets and variables > Actions:
+#   SSH_HOST, SSH_PORT, SSH_USER, SSH_PRIVATE_KEY, LARAVEL_PATH, PUBLIC_PATH
+# Opsional:
+#   PRODUCTION_ENV  -> isi lengkap .env produksi. Kalau diisi, .env di server
+#                      ditimpa setiap deploy, jadi perubahan .env cukup di GitHub.
+#   Variable PHP_BIN -> path PHP CLI di server kalau `php` bukan versi 8.3
+#                      (mis. /opt/alt/php83/usr/bin/php).
+
+name: Deploy ke Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: npm ci && npm run build
+      - run: cp .env.example .env && php artisan key:generate
+      - run: php artisan test --compact
+
+  deploy:
+    name: Deploy
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      SSH_TARGET: hostinger
+      SSH_CMD: ssh
+      LARAVEL_PATH: ${{ secrets.LARAVEL_PATH }}
+      PUBLIC_PATH: ${{ secrets.PUBLIC_PATH }}
+      PHP_BIN: ${{ vars.PHP_BIN || 'php' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Build untuk produksi
+        run: |
+          composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
+          npm ci
+          npm run build
+
+      - name: Siapkan koneksi SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+          printf 'Host hostinger\n  HostName %s\n  Port %s\n  User %s\n  IdentityFile ~/.ssh/id_deploy\n  IdentitiesOnly yes\n' \
+            "$SSH_HOST" "$SSH_PORT" "$SSH_USER" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+          ssh hostinger "echo SSH OK"
+
+      # Aset publik diupload lebih dulu supaya file build baru sudah ada saat
+      # kode baru mulai merujuknya lewat manifest Vite.
+      - name: Upload aset publik (public_html)
+        run: |
+          rsync -az --exclude index.php --exclude build/ \
+            -e "$SSH_CMD" public/ "$SSH_TARGET:$PUBLIC_PATH/"
+          rsync -az --delete \
+            -e "$SSH_CMD" public/build/ "$SSH_TARGET:$PUBLIC_PATH/build/"
+
+      # --delete membersihkan file lama, tapi path yang di-exclude (.env,
+      # storage, dll.) tidak pernah disentuh di server.
+      - name: Upload kode aplikasi
+        run: |
+          rsync -az --delete \
+            --exclude .git/ --exclude .github/ --exclude .claude/ --exclude .ai/ \
+            --exclude node_modules/ --exclude tests/ --exclude scratch/ \
+            --exclude public/ --exclude storage/ \
+            --exclude '.env' --exclude '.env.*' \
+            -e "$SSH_CMD" ./ "$SSH_TARGET:$LARAVEL_PATH/"
+
+      - name: Perbarui .env produksi (opsional)
+        env:
+          PRODUCTION_ENV: ${{ secrets.PRODUCTION_ENV }}
+        run: |
+          if [ -n "$PRODUCTION_ENV" ]; then
+            printf '%s\n' "$PRODUCTION_ENV" | $SSH_CMD "$SSH_TARGET" "cat > '$LARAVEL_PATH/.env'"
+            echo ".env diperbarui dari secret PRODUCTION_ENV"
+          else
+            echo "PRODUCTION_ENV kosong, .env di server dibiarkan"
+          fi
+
+      - name: Refresh cache Laravel
+        run: |
+          $SSH_CMD "$SSH_TARGET" "cd '$LARAVEL_PATH' \
+            && mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs \
+            && $PHP_BIN artisan optimize:clear \
+            && $PHP_BIN artisan optimize"
+
+      - name: Cek situs hidup
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' https://www.cvgebrinajaya.com/)
+          echo "HTTP $status"
+          test "$status" = "200"
