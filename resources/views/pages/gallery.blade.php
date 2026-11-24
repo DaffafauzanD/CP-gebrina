@@ -1,7 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Galeri Kegiatan & Armada - CV GEBRINA JAYA')
+@section('title', 'Galeri Armada & Hasil Kerja Sedot WC | CV Gebrina Jaya')
 @section('meta_description', 'Dokumentasi foto kegiatan lapangan, armada truk vakum, proses sedot septic tank, dan pelancaran saluran mampet CV GEBRINA JAYA.')
+
+{{-- Filter kategori berjalan di sisi klien, jadi galeri hanya punya satu URL
+     dan tidak ada lagi duplikat tipis yang perlu di-noindex. --}}
+@section('canonical', route('gallery'))
+
+@section('schema_json')
+    @include('components.schema.breadcrumbs', ['items' => [
+        ['name' => 'Beranda', 'url' => route('home')],
+        ['name' => 'Galeri', 'url' => route('gallery')],
+    ]])
+@endsection
 
 @section('content')
 
@@ -18,6 +29,7 @@
 
 <!-- GALLERY CONTENT WITH ALPINE LIGHTBOX -->
 <section x-data="{ 
+    category: 'all',
     modalOpen: false, 
     activeImage: '', 
     activeTitle: '', 
@@ -36,18 +48,18 @@
         <!-- CATEGORY FILTER TABS -->
         <div class="flex flex-wrap items-center justify-center gap-2">
             @foreach($categories as $catKey => $catLabel)
-                <a href="{{ route('gallery', ['category' => $catKey]) }}" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all {{ ($category == $catKey || ($catKey == 'all' && empty($category))) ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200' }}">
+                <button type="button" @click="category = @js($catKey)" :class="category === @js($catKey) ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all">
                     {{ $catLabel }}
-                </a>
+                </button>
             @endforeach
         </div>
 
         <!-- PHOTO GRID -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @forelse($galleryItems as $item)
-                <div @click="openModal('{{ asset($item->image_path) }}', '{{ addslashes($item->title) }}', '{{ addslashes($item->description ?? '') }}', '{{ $item->category }}')" class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 cursor-pointer group hover:shadow-2xl transition-all duration-300">
+                <div x-show="category === 'all' || category === @js($item->category)" @click="openModal(@js(\App\Support\VersionedAsset::url($item->image_path)), @js($item->title), @js($item->description ?? ''), @js(ucfirst(str_replace('-', ' ', $item->category))))" class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 cursor-pointer group hover:shadow-2xl transition-all duration-300">
                     <div class="relative h-60 overflow-hidden">
-                        <img src="{{ asset($item->image_path) }}" alt="{{ $item->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        @include('components.picture', ['src' => $item->image_path, 'alt' => $item->title, 'loading' => 'lazy', 'sizes' => '(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw', 'class' => 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'])
                         <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <span class="p-3 bg-white/90 text-slate-900 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
@@ -58,7 +70,7 @@
                         <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
                             {{ ucfirst(str_replace('-', ' ', $item->category)) }}
                         </span>
-                        <h4 class="font-bold text-slate-900 text-sm line-clamp-2">{{ $item->title }}</h4>
+                        <h2 class="font-bold text-slate-900 text-sm line-clamp-2">{{ $item->title }}</h2>
                     </div>
                 </div>
             @empty
@@ -95,7 +107,7 @@
 
                 <div class="pt-4 border-t border-slate-200 space-y-3">
                     <div class="text-xs text-slate-500 font-semibold">Butuh penanganan serupa di lokasi Anda?</div>
-                    <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya mau tanya pekerjaan sesuai foto galeri.') }}" target="_blank" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors">
+                    <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya mau tanya pekerjaan sesuai foto galeri.') }}" target="_blank" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                         <span>Hubungi via WhatsApp</span>
                     </a>

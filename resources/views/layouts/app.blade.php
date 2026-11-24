@@ -2,38 +2,32 @@
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    @include('components.google-tag')
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    
-    <title>@yield('title', config('company.name') . ' - ' . config('company.tagline'))</title>
-    <meta name="description" content="@yield('meta_description', config('company.description'))">
-    <meta name="keywords" content="sedot wc jakarta, sedot wc bogor, sedot wc depok, sedot wc tangerang, sedot wc bekasi, sedot septic tank jabodetabek, pelancaran saluran mampet, gebrina jaya">
-    <meta name="author" content="CV GEBRINA JAYA">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="{{ url()->current() }}">
 
-    <!-- Open Graph / Facebook / WhatsApp -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('title', config('company.name'))">
-    <meta property="og:description" content="@yield('meta_description', config('company.description'))">
-    <meta property="og:image" content="@yield('og_image', asset('images/hero-truck.jpg'))">
-    <meta property="og:site_name" content="CV GEBRINA JAYA">
-    <meta property="og:locale" content="id_ID">
+    @include('components.seo')
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
-    <!-- Google Fonts -->
+    {{-- Google Fonts dimuat tanpa memblokir render: halaman langsung tampil dengan
+         font sistem, lalu berganti ke Plus Jakarta Sans begitu CSS-nya tiba. --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"></noscript>
 
+    <!-- Structured Data -->
+    @include('components.schema.local-business')
     @yield('schema_json')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased text-slate-800 bg-slate-50 flex flex-col min-h-screen">
+    @if($googleTagManagerId = config('services.google_tag_manager.id'))
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $googleTagManagerId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    @endif
 
     <!-- Top Announcement Bar -->
     <div class="bg-amber-500 text-slate-950 py-2 px-4 text-xs sm:text-sm font-semibold text-center flex items-center justify-center space-x-2">
@@ -51,7 +45,7 @@
 
     <!-- Flash Messages -->
     @if(session('success'))
-        <div x-data="{ show: true }" x-show="show" x-transition class="bg-emerald-600 text-white px-4 py-3 shadow-lg fixed top-20 right-4 z-50 rounded-xl flex items-center space-x-3 border border-emerald-400">
+        <div x-data="{ show: true }" x-show="show" x-transition class="bg-emerald-700 text-white px-4 py-3 shadow-lg fixed top-20 right-4 z-50 rounded-xl flex items-center space-x-3 border border-emerald-400">
             <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <div class="text-sm font-medium">{{ session('success') }}</div>
             <button @click="show = false" class="text-emerald-200 hover:text-white font-bold">&times;</button>

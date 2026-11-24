@@ -3,19 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Fluent;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(): View
     {
-        $services = Service::orderBy('order', 'asc')->get();
-        return view('pages.services.index', compact('services'));
+        return view('pages.services.index', [
+            'services' => Service::all(),
+        ]);
     }
 
-    public function show(Service $service)
+    public function show(string $slug): View
     {
-        $otherServices = Service::where('id', '!=', $service->id)->orderBy('order', 'asc')->get();
-        return view('pages.services.show', compact('service', 'otherServices'));
+        $service = Service::findBySlug($slug);
+
+        abort_if($service === null, 404);
+
+        return view('pages.services.show', [
+            'service' => $service,
+            'otherServices' => Service::all()
+                ->reject(fn (Fluent $other): bool => $other->slug === $slug)
+                ->values(),
+        ]);
     }
 }

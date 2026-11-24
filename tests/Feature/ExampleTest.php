@@ -3,58 +3,49 @@
 namespace Tests\Feature;
 
 use App\Models\Service;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_home_page_returns_successful_response(): void
     {
-        $this->seed();
-        $response = $this->get('/');
-        $response->assertStatus(200);
+        $this->get('/')->assertOk();
     }
 
     public function test_about_page_returns_successful_response(): void
     {
-        $response = $this->get('/tentang-kami');
-        $response->assertStatus(200);
+        $this->get('/tentang-kami')->assertOk();
     }
 
     public function test_services_index_page_returns_successful_response(): void
     {
-        $this->seed();
-        $response = $this->get('/layanan');
-        $response->assertStatus(200);
+        $this->get('/layanan')->assertOk();
     }
 
     public function test_service_show_page_returns_successful_response(): void
     {
-        $this->seed();
-        $service = Service::first();
-        $response = $this->get('/layanan/' . $service->slug);
-        $response->assertStatus(200);
+        $service = Service::all()->first();
+
+        $this->get('/layanan/'.$service->slug)->assertOk();
+    }
+
+    public function test_unknown_service_slug_returns_not_found(): void
+    {
+        $this->get('/layanan/layanan-yang-tidak-ada')->assertNotFound();
     }
 
     public function test_areas_page_returns_successful_response(): void
     {
-        $this->seed();
-        $response = $this->get('/wilayah-layanan');
-        $response->assertStatus(200);
+        $this->get('/wilayah-layanan')->assertOk();
     }
 
     public function test_gallery_page_returns_successful_response(): void
     {
-        $this->seed();
-        $response = $this->get('/galeri');
-        $response->assertStatus(200);
+        $this->get('/galeri')->assertOk();
     }
 
     public function test_contact_page_returns_not_found(): void
     {
-        $response = $this->get('/kontak');
-        $response->assertStatus(404);
+        $this->get('/kontak')->assertNotFound();
     }
 }

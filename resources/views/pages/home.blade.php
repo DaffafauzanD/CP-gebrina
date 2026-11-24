@@ -1,53 +1,10 @@
 @extends('layouts.app')
 
-@section('title', config('company.name') . ' - Jasa Sedot WC & Septic Tank Jabodetabek 24 Jam')
+@section('title', 'Jasa Sedot WC & Septic Tank Jabodetabek 24 Jam | Gebrina Jaya')
+@section('meta_description', 'Jasa sedot WC, kuras septic tank, dan pelancaran saluran mampet 24 jam di Jabodetabek. Armada truk vakum, selang 100+ meter, pengerjaan bergaransi. Hubungi CV GEBRINA JAYA sekarang.')
 
 @section('schema_json')
-<script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "{{ config('company.name') }}",
-  "image": "{{ asset('images/hero-truck.jpg') }}",
-  "@id": "{{ url('/') }}",
-  "url": "{{ url('/') }}",
-  "telephone": "{{ config('company.contact.phone_raw') }}",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Jl. Raya Bogor KM 26 No. 88, Ciracas",
-    "addressLocality": "Jakarta Timur",
-    "addressRegion": "DKI Jakarta",
-    "postalCode": "13740",
-    "addressCountry": "ID"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": -6.310931,
-    "longitude": 106.876678
-  },
-  "openingHoursSpecification": {
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday"
-    ],
-    "opens": "00:00",
-    "closes": "23:59"
-  },
-  "areaServed": [
-    "Jakarta", "Bogor", "Depok", "Tangerang", "Bekasi"
-  ],
-  "sameAs": [
-    "{{ config('company.socials.facebook') }}",
-    "{{ config('company.socials.instagram') }}"
-  ]
-}
-</script>
+    @include('components.schema.website')
 @endsection
 
 @section('content')
@@ -59,9 +16,9 @@
     
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             <!-- Left Hero Content -->
-            <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
                 
                 <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-blue-900/60 border border-blue-700 text-amber-400 text-xs sm:text-sm font-semibold">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
@@ -78,7 +35,7 @@
 
                 <!-- Hero CTA Buttons -->
                 <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-3 sm:space-y-0 sm:space-x-4">
-                    <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode(config('company.contact.whatsapp_message_default')) }}" target="_blank" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-extrabold text-base shadow-xl shadow-emerald-950/60 hover:shadow-emerald-900/90 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center space-x-3">
+                    <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode(config('company.contact.whatsapp_message_default')) }}" target="_blank" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-green-600 hover:from-emerald-800 hover:to-green-800 text-white font-extrabold text-base shadow-xl shadow-emerald-950/60 hover:shadow-emerald-900/90 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center space-x-3">
                         <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                         <span>Pesan via WhatsApp (24 Jam)</span>
                     </a>
@@ -108,17 +65,22 @@
             </div>
 
             <!-- Right Hero Card / Image -->
-            <div class="lg:col-span-5 relative">
-                <div class="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-slate-700/60 group">
-                    <img src="{{ asset('images/hero-truck.jpg') }}" alt="Truk Vakum Sedot WC CV Gebrina Jaya" loading="lazy" class="w-full h-[380px] sm:h-[450px] object-cover group-hover:scale-105 transition-transform duration-500">
-                    
-                    <!-- Floating Overlay Card -->
-                    <div class="absolute bottom-4 left-4 right-4 bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-slate-700 text-white space-y-1">
+            <div class="lg:col-span-6 relative">
+                {{-- Foto armada dipasang dengan rasio 16:9 sesuai file aslinya supaya kedua
+                     truk dan papan nama kantor tidak terpotong object-cover. Kartu info
+                     diletakkan di bawah foto, bukan menumpuk, agar badan truk tetap terlihat. --}}
+                <div class="rounded-2xl overflow-hidden shadow-2xl border-2 border-slate-700/60 group bg-slate-900">
+                    <div class="overflow-hidden">
+                        @include('components.picture', ['src' => 'images/hero-truck.jpg', 'alt' => 'Armada truk tangki vakum CV GEBRINA JAYA di depan kantor Griya Asri 2, Bekasi', 'priority' => true, 'sizes' => '(min-width: 1024px) 600px, 100vw', 'class' => 'w-full aspect-[16/9] object-cover group-hover:scale-105 transition-transform duration-500'])
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="p-4 border-t border-slate-700 text-white space-y-1">
                         <div class="flex items-center justify-between">
                             <span class="text-xs uppercase font-extrabold text-amber-400 tracking-wider">Armada Utama</span>
                             <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px] font-bold border border-emerald-800">Siap Operasional</span>
                         </div>
-                        <h4 class="text-sm font-bold text-white">Truk Tangki Vakum High-Power (5000L)</h4>
+                        <p class="text-sm font-bold text-white">Truk Tangki Vakum High-Power (5000L)</p>
                         <p class="text-xs text-slate-300">Penanganan higienis tanpa bau & jangkauan gang sempit.</p>
                     </div>
                 </div>
@@ -180,7 +142,7 @@
             @foreach($services->take(3) as $service)
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200 flex flex-col hover:shadow-2xl transition-all duration-300 group">
                     <div class="relative h-48 overflow-hidden">
-                        <img src="{{ asset($service->image_path ?? 'images/services/service-sedot-wc.jpg') }}" alt="{{ $service->name }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        @include('components.picture', ['src' => $service->image_path ?? 'images/hero-truck.jpg', 'alt' => $service->name, 'loading' => 'lazy', 'sizes' => '(min-width: 1024px) 400px, (min-width: 768px) 50vw, 100vw', 'class' => 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'])
                     </div>
                     <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
                         <div>
@@ -195,7 +157,7 @@
                             <a href="{{ route('services.show', $service->slug) }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
                                 Detail Layanan &rarr;
                             </a>
-                            <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya tertarik dengan layanan ' . $service->name) }}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors">
+                            <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya tertarik dengan layanan ' . $service->name) }}" target="_blank" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold transition-colors">
                                 WA Langsung
                             </a>
                         </div>
@@ -218,7 +180,7 @@
         </div>
 
         <div class="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center">
-            @foreach(['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'] as $cityName)
+            @foreach(config('company.service_areas') as $cityName)
                 <a href="{{ route('areas') }}" class="bg-slate-800/80 hover:bg-blue-600 p-5 rounded-2xl border border-slate-700 hover:border-blue-400 transition-all duration-300 group">
                     <div class="w-10 h-10 rounded-full bg-blue-900/80 text-amber-400 flex items-center justify-center mx-auto mb-3 group-hover:bg-white group-hover:text-blue-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
@@ -236,6 +198,43 @@
             </a>
         </div>
 
+    </div>
+</section>
+
+<!-- OWNER HIGHLIGHT SECTION -->
+@php($owner = config('company.owner'))
+<section class="py-16 bg-slate-50 border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-10">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
+
+                <div class="shrink-0">
+                    @include('components.picture', [
+                        'src' => $owner['photo_path'],
+                        'alt' => trim(($owner['name'] ?: 'Pemilik').' - '.$owner['role'].' CV GEBRINA JAYA'),
+                        'loading' => 'lazy',
+                        'sizes' => '160px',
+                        'class' => 'w-32 sm:w-40 aspect-[3/4] rounded-2xl object-cover ring-4 ring-slate-100',
+                    ])
+                </div>
+
+                <div class="space-y-3 text-center sm:text-left">
+                    <span class="text-xs font-extrabold text-blue-600 uppercase tracking-widest">Pesan dari Pemilik</span>
+                    <p class="text-base sm:text-lg text-slate-800 font-medium leading-relaxed italic">
+                        "{{ $owner['quote'] }}"
+                    </p>
+                    <div class="pt-1">
+                        <div class="text-sm font-extrabold text-slate-900">{{ $owner['name'] ?: $owner['role'] }}</div>
+                        <div class="text-xs text-slate-500 font-semibold">{{ $owner['name'] ? $owner['role'].' · ' : '' }}{{ config('company.name') }}</div>
+                    </div>
+                    <a href="{{ route('about') }}" class="inline-flex items-center space-x-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                        <span>Kenali perusahaan kami lebih dekat</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                </div>
+
+            </div>
+        </div>
     </div>
 </section>
 
@@ -296,7 +295,7 @@
             Jangan tunggu sampai meluap dan merusak kenyamanan tempat tinggal Anda. Hubungi kami sekarang dan tim kami siap meluncur dengan cepat dan bergaransi.
         </p>
         <div class="pt-4 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya butuh penanganan darurat sedot WC sekarang.') }}" target="_blank" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-base shadow-xl flex items-center justify-center space-x-3">
+            <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya butuh penanganan darurat sedot WC sekarang.') }}" target="_blank" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-base shadow-xl flex items-center justify-center space-x-3">
                 <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                 <span>Panggil Armada Sekarang (WA)</span>
             </a>

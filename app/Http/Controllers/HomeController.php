@@ -4,20 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\GalleryItem;
 use App\Models\Service;
-use App\Models\ServiceArea;
 use App\Models\Testimonial;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
 
 class HomeController extends Controller
 {
-    public function __invoke(Request $request)
+    public function __invoke(): View
     {
-        $services = Service::orderBy('order', 'asc')->get();
-        $testimonials = Testimonial::latest()->get();
-        $galleryItems = GalleryItem::latest()->take(6)->get();
-        
-        $areasByCity = ServiceArea::all()->groupBy('city');
-
-        return view('pages.home', compact('services', 'testimonials', 'galleryItems', 'areasByCity'));
+        return view('pages.home', [
+            'services' => Service::all(),
+            'testimonials' => Testimonial::all(),
+            'galleryItems' => GalleryItem::all()->take(6),
+        ]);
     }
 }

@@ -1,7 +1,18 @@
 @extends('layouts.app')
 
-@section('title', $service->name . ' - CV GEBRINA JAYA Jabodetabek')
+@section('title', $service->seo_title ?? $service->name.' | CV Gebrina Jaya')
 @section('meta_description', $service->short_description)
+@section('og_image', \App\Support\VersionedAsset::url($service->image_path ?? 'images/hero-truck.jpg'))
+@section('og_image_alt', $service->name)
+
+@section('schema_json')
+    @include('components.schema.breadcrumbs', ['items' => [
+        ['name' => 'Beranda', 'url' => route('home')],
+        ['name' => 'Layanan', 'url' => route('services.index')],
+        ['name' => $service->name, 'url' => route('services.show', $service->slug)],
+    ]])
+    @include('components.schema.service')
+@endsection
 
 @section('content')
 
@@ -36,7 +47,7 @@
             <div class="lg:col-span-8 space-y-8">
                 
                 <div class="rounded-2xl overflow-hidden shadow-xl border border-slate-200">
-                    <img src="{{ asset($service->image_path ?? 'images/services/service-sedot-wc.jpg') }}" alt="{{ $service->name }}" class="w-full h-[360px] sm:h-[450px] object-cover">
+                    @include('components.picture', ['src' => $service->image_path ?? 'images/hero-truck.jpg', 'alt' => $service->name, 'priority' => true, 'sizes' => '(min-width: 1024px) 800px, 100vw', 'class' => 'w-full h-[360px] sm:h-[450px] object-cover'])
                 </div>
 
                 <div class="prose prose-slate max-w-none space-y-4">
@@ -67,7 +78,7 @@
                         Tim CV GEBRINA JAYA siap meluncur ke lokasi Anda 24 Jam Nonstop dengan armada tangki vakum bersih dan garansi kepuasan.
                     </p>
                     <div class="pt-2 flex flex-col sm:flex-row gap-4">
-                        <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya bermaksud memesan layanan: ' . $service->name) }}" target="_blank" class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold rounded-xl shadow-lg flex items-center justify-center space-x-2 text-sm">
+                        <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya bermaksud memesan layanan: ' . $service->name) }}" target="_blank" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold rounded-xl shadow-lg flex items-center justify-center space-x-2 text-sm">
                             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                             <span>Pesan via WhatsApp Direct</span>
                         </a>

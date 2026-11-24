@@ -7,7 +7,7 @@
     </div>
 
     <!-- Floating Pulse Button -->
-    <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode(config('company.contact.whatsapp_message_default')) }}" target="_blank" aria-label="Chat WhatsApp 24 Jam" class="relative inline-flex items-center justify-center w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-2xl hover:scale-110 transition-transform duration-300">
+    <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode(config('company.contact.whatsapp_message_default')) }}" target="_blank" aria-label="Chat WhatsApp 24 Jam" class="relative inline-flex items-center justify-center w-14 h-14 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full shadow-2xl hover:scale-110 transition-transform duration-300">
         
         <!-- Pulse Outer Ring -->
         <span class="absolute -inset-1 rounded-full bg-emerald-400 animate-pulse-ring opacity-75 pointer-events-none"></span>

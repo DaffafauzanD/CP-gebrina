@@ -1,0 +1,164 @@
+# Deploy otomatis ke Hostinger setiap ada push ke branch main.
+#
+# Alur: jalankan test -> build aset (composer --no-dev + vite) di GitHub ->
+# upload lewat FTPS. Paket Single Web Hosting tidak punya SSH, jadi semua yang
+# perlu dijalankan (composer, npm) dikerjakan di GitHub, server hanya menerima
+# file jadi. Server juga tidak memakai config/route cache, jadi tidak ada
+# perintah artisan yang perlu dijalankan setelah upload.
+#
+# Struktur di server (sama seperti deploy manual sebelumnya):
+#   domains/cvgebrinajaya.com/laravel      -> kode aplikasi, .env, storage
+#   domains/cvgebrinajaya.com/public_html  -> folder publik
+# public_html/index.php di server versi khusus (menunjuk ke ../laravel), jadi
+# tidak pernah ditimpa oleh public/index.php dari repo. .env dan storage/ di
+# server juga tidak pernah disentuh.
+#
+# Upload memakai catatan hash (.ftp-deploy-sync-state.json) di server, jadi
+# hanya file yang berubah yang dikirim. Deploy pertama mengirim semua file
+# (termasuk vendor/) dan butuh waktu lebih lama.
+#
+# Secrets di GitHub > Settings > Secrets and variables > Actions:
+#   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   (wajib)
+#   PRODUCTION_ENV  (opsional) isi lengkap .env produksi. Kalau diisi, .env di
+#                   server ditimpa setiap deploy.
+
+name: Deploy ke Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: npm ci && npm run build
+      - run: cp .env.example .env && php artisan key:generate
+      - run: php artisan test --compact
+
+  deploy:
+    name: Deploy
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Build untuk produksi
+        run: |
+          composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
+          npm ci
+          npm run build
+
+      # Folder awal login FTP berbeda antar akun, jadi cari folder yang benar-benar
+      # berisi laravel/artisan. Kalau tidak ketemu, deploy berhenti sebelum
+      # mengupload apa pun ke tempat yang salah.
+      - name: Cari folder situs di FTP
+        id: paths
+        run: |
+          for base in "domains/cvgebrinajaya.com/" ""; do
+            if curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" --list-only \
+                "ftp://$FTP_SERVER/${base}laravel/" | grep -qx artisan; then
+              echo "base=$base" >> "$GITHUB_OUTPUT"
+              echo "Folder situs: /${base}"
+              exit 0
+            fi
+          done
+          echo "laravel/artisan tidak ditemukan. Isi folder awal FTP:"
+          curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" --list-only "ftp://$FTP_SERVER/" || true
+          exit 1
+
+      # Aset publik diupload lebih dulu supaya file build baru sudah ada saat
+      # kode baru mulai merujuknya lewat manifest Vite.
+      - name: Upload aset publik (public_html)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
+          local-dir: ./public/
+          server-dir: ${{ steps.paths.outputs.base }}public_html/
+          exclude: |
+            index.php
+
+      - name: Upload kode aplikasi
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
+          local-dir: ./
+          server-dir: ${{ steps.paths.outputs.base }}laravel/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            .claude/**
+            .ai/**
+            node_modules/**
+            tests/**
+            scratch/**
+            public/**
+            storage/**
+            .env
+            .env.*
+
+      - name: Perbarui .env produksi (opsional)
+        env:
+          PRODUCTION_ENV: ${{ secrets.PRODUCTION_ENV }}
+          BASE: ${{ steps.paths.outputs.base }}
+        run: |
+          if [ -z "$PRODUCTION_ENV" ]; then
+            echo "PRODUCTION_ENV kosong, .env di server dibiarkan"
+            exit 0
+          fi
+          printf '%s\n' "$PRODUCTION_ENV" > production.env
+          curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" \
+            -T production.env "ftp://$FTP_SERVER/${BASE}laravel/.env"
+          rm production.env
+          echo ".env diperbarui dari secret PRODUCTION_ENV"
+
+      - name: Cek situs hidup
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' https://www.cvgebrinajaya.com/)
+          echo "HTTP $status"
+          test "$status" = "200"

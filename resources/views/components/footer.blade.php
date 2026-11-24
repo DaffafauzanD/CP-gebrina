@@ -73,14 +73,14 @@
         </div>
 
         <!-- Bottom Copyright & Legalities -->
-        <div class="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 space-y-4 md:space-y-0">
+        <div class="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-slate-400 space-y-4 md:space-y-0">
             <div>
                 &copy; {{ date('Y') }} <strong class="text-slate-300">CV GEBRINA JAYA</strong>. Hak Cipta Dilindungi Undang-Undang.
             </div>
             <div class="flex items-center space-x-4">
                 <span>{{ config('company.legalities.nib') }}</span>
                 <span>•</span>
-                <span>Pembuangan Resmi IPLT LH</span>
+                <!-- <span>Pembuangan Resmi IPLT LH</span> -->
             </div>
         </div>
     </div>

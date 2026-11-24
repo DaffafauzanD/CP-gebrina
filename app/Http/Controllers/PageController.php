@@ -3,41 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\GalleryItem;
-use App\Models\ServiceArea;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
 
 class PageController extends Controller
 {
-    public function about()
+    public function about(): View
     {
         return view('pages.about');
     }
 
-    public function areas()
+    public function areas(): View
     {
-        $areasByCity = ServiceArea::all()->groupBy('city');
-        return view('pages.areas', compact('areasByCity'));
+        return view('pages.areas');
     }
 
-    public function gallery(Request $request)
+    public function gallery(): View
     {
-        $category = $request->query('category');
-        
-        $query = GalleryItem::latest();
-        if ($category && $category !== 'all') {
-            $query->where('category', $category);
-        }
-
-        $galleryItems = $query->get();
-        $categories = [
-            'all' => 'Semua Foto',
-            'sedot-wc' => 'Sedot WC',
-            'saluran-mampet' => 'Saluran Mampet',
-            'septic-tank' => 'Septic Tank',
-            'limbah-industri' => 'Limbah & Restoran',
-            'armada' => 'Armada & Tim',
-        ];
-
-        return view('pages.gallery', compact('galleryItems', 'categories', 'category'));
+        return view('pages.gallery', [
+            'galleryItems' => GalleryItem::all(),
+            'categories' => GalleryItem::categories(),
+        ]);
     }
 }

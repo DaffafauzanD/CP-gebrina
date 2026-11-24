@@ -1,7 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Wilayah Layanan Sedot WC Jabodetabek - CV GEBRINA JAYA')
+@section('title', 'Wilayah Layanan Sedot WC Jabodetabek | CV Gebrina Jaya')
 @section('meta_description', 'Jangkauan wilayah layanan CV GEBRINA JAYA di seluruh kawasan Jabodetabek: Jakarta, Bogor, Depok, Tangerang, dan Bekasi. Melayani 24 Jam Nonstop dengan armada tangki terdekat.')
+
+@section('schema_json')
+    @include('components.schema.breadcrumbs', ['items' => [
+        ['name' => 'Beranda', 'url' => route('home')],
+        ['name' => 'Wilayah Layanan', 'url' => route('areas')],
+    ]])
+@endsection
 
 @section('content')
 
@@ -21,7 +28,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach(['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'] as $region)
+            @foreach(config('company.service_areas') as $region)
                 <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 space-y-4 hover:shadow-xl transition-shadow">
                     <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
                         <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
@@ -29,7 +36,7 @@
                         </div>
                         <div>
                             <h2 class="text-lg font-extrabold text-slate-900">Area {{ $region }}</h2>
-                            <span class="text-xs text-emerald-600 font-semibold flex items-center space-x-1 mt-0.5">
+                            <span class="text-xs text-emerald-700 font-semibold flex items-center space-x-1 mt-0.5">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                                 <span>Jabodetabek Coverage</span>
                             </span>
@@ -41,7 +48,7 @@
                     </p>
 
                     <div class="pt-2">
-                        <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya ingin panggil armada sedot WC untuk area ' . $region) }}" target="_blank" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors">
+                        <a href="https://wa.me/{{ config('company.contact.whatsapp_number') }}?text={{ urlencode('Halo CV GEBRINA JAYA, saya ingin panggil armada sedot WC untuk area ' . $region) }}" target="_blank" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors">
                             <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                             <span>Panggil Armada {{ $region }}</span>
                         </a>
