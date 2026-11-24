@@ -1,21 +1,26 @@
 # Deploy otomatis ke Hostinger setiap ada push ke branch main.
 #
-# Alur: jalankan test -> build aset (composer + vite) di GitHub -> upload lewat
-# SSH/rsync -> refresh cache Laravel di server. Server tidak perlu Node/npm.
+# Alur: jalankan test -> build aset (composer --no-dev + vite) di GitHub ->
+# upload lewat FTPS. Paket Single Web Hosting tidak punya SSH, jadi semua yang
+# perlu dijalankan (composer, npm) dikerjakan di GitHub, server hanya menerima
+# file jadi. Server juga tidak memakai config/route cache, jadi tidak ada
+# perintah artisan yang perlu dijalankan setelah upload.
 #
 # Struktur di server (sama seperti deploy manual sebelumnya):
-#   LARAVEL_PATH  -> kode aplikasi, .env, storage   (mis. /home/u123/domains/cvgebrinajaya.com/laravel)
-#   PUBLIC_PATH   -> folder publik (public_html)     (mis. /home/u123/domains/cvgebrinajaya.com/public_html)
+#   domains/cvgebrinajaya.com/laravel      -> kode aplikasi, .env, storage
+#   domains/cvgebrinajaya.com/public_html  -> folder publik
 # public_html/index.php di server versi khusus (menunjuk ke ../laravel), jadi
-# tidak pernah ditimpa oleh public/index.php dari repo.
+# tidak pernah ditimpa oleh public/index.php dari repo. .env dan storage/ di
+# server juga tidak pernah disentuh.
 #
-# Secrets yang wajib diisi di GitHub > Settings > Secrets and variables > Actions:
-#   SSH_HOST, SSH_PORT, SSH_USER, SSH_PRIVATE_KEY, LARAVEL_PATH, PUBLIC_PATH
-# Opsional:
-#   PRODUCTION_ENV  -> isi lengkap .env produksi. Kalau diisi, .env di server
-#                      ditimpa setiap deploy, jadi perubahan .env cukup di GitHub.
-#   Variable PHP_BIN -> path PHP CLI di server kalau `php` bukan versi 8.3
-#                      (mis. /opt/alt/php83/usr/bin/php).
+# Upload memakai catatan hash (.ftp-deploy-sync-state.json) di server, jadi
+# hanya file yang berubah yang dikirim. Deploy pertama mengirim semua file
+# (termasuk vendor/) dan butuh waktu lebih lama.
+#
+# Secrets di GitHub > Settings > Secrets and variables > Actions:
+#   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   (wajib)
+#   PRODUCTION_ENV  (opsional) isi lengkap .env produksi. Kalau diisi, .env di
+#                   server ditimpa setiap deploy.
 
 name: Deploy ke Hostinger
 
@@ -57,11 +62,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
-      SSH_TARGET: hostinger
-      SSH_CMD: ssh
-      LARAVEL_PATH: ${{ secrets.LARAVEL_PATH }}
-      PUBLIC_PATH: ${{ secrets.PUBLIC_PATH }}
-      PHP_BIN: ${{ vars.PHP_BIN || 'php' }}
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -82,59 +85,77 @@ jobs:
           npm ci
           npm run build
 
-      - name: Siapkan koneksi SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_USER: ${{ secrets.SSH_USER }}
+      # Folder awal login FTP berbeda antar akun, jadi cari folder yang benar-benar
+      # berisi laravel/artisan. Kalau tidak ketemu, deploy berhenti sebelum
+      # mengupload apa pun ke tempat yang salah.
+      - name: Cari folder situs di FTP
+        id: paths
         run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
-          printf 'Host hostinger\n  HostName %s\n  Port %s\n  User %s\n  IdentityFile ~/.ssh/id_deploy\n  IdentitiesOnly yes\n' \
-            "$SSH_HOST" "$SSH_PORT" "$SSH_USER" > ~/.ssh/config
-          chmod 600 ~/.ssh/config
-          ssh hostinger "echo SSH OK"
+          for base in "domains/cvgebrinajaya.com/" ""; do
+            if curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" --list-only \
+                "ftp://$FTP_SERVER/${base}laravel/" | grep -qx artisan; then
+              echo "base=$base" >> "$GITHUB_OUTPUT"
+              echo "Folder situs: /${base}"
+              exit 0
+            fi
+          done
+          echo "laravel/artisan tidak ditemukan. Isi folder awal FTP:"
+          curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" --list-only "ftp://$FTP_SERVER/" || true
+          exit 1
 
       # Aset publik diupload lebih dulu supaya file build baru sudah ada saat
       # kode baru mulai merujuknya lewat manifest Vite.
       - name: Upload aset publik (public_html)
-        run: |
-          rsync -az --exclude index.php --exclude build/ \
-            -e "$SSH_CMD" public/ "$SSH_TARGET:$PUBLIC_PATH/"
-          rsync -az --delete \
-            -e "$SSH_CMD" public/build/ "$SSH_TARGET:$PUBLIC_PATH/build/"
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
+          local-dir: ./public/
+          server-dir: ${{ steps.paths.outputs.base }}public_html/
+          exclude: |
+            index.php
 
-      # --delete membersihkan file lama, tapi path yang di-exclude (.env,
-      # storage, dll.) tidak pernah disentuh di server.
       - name: Upload kode aplikasi
-        run: |
-          rsync -az --delete \
-            --exclude .git/ --exclude .github/ --exclude .claude/ --exclude .ai/ \
-            --exclude node_modules/ --exclude tests/ --exclude scratch/ \
-            --exclude public/ --exclude storage/ \
-            --exclude '.env' --exclude '.env.*' \
-            -e "$SSH_CMD" ./ "$SSH_TARGET:$LARAVEL_PATH/"
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
+          local-dir: ./
+          server-dir: ${{ steps.paths.outputs.base }}laravel/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            .claude/**
+            .ai/**
+            node_modules/**
+            tests/**
+            scratch/**
+            public/**
+            storage/**
+            .env
+            .env.*
 
       - name: Perbarui .env produksi (opsional)
         env:
           PRODUCTION_ENV: ${{ secrets.PRODUCTION_ENV }}
+          BASE: ${{ steps.paths.outputs.base }}
         run: |
-          if [ -n "$PRODUCTION_ENV" ]; then
-            printf '%s\n' "$PRODUCTION_ENV" | $SSH_CMD "$SSH_TARGET" "cat > '$LARAVEL_PATH/.env'"
-            echo ".env diperbarui dari secret PRODUCTION_ENV"
-          else
+          if [ -z "$PRODUCTION_ENV" ]; then
             echo "PRODUCTION_ENV kosong, .env di server dibiarkan"
+            exit 0
           fi
-
-      - name: Refresh cache Laravel
-        run: |
-          $SSH_CMD "$SSH_TARGET" "cd '$LARAVEL_PATH' \
-            && mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs \
-            && $PHP_BIN artisan optimize:clear \
-            && $PHP_BIN artisan optimize"
+          printf '%s\n' "$PRODUCTION_ENV" > production.env
+          curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" \
+            -T production.env "ftp://$FTP_SERVER/${BASE}laravel/.env"
+          rm production.env
+          echo ".env diperbarui dari secret PRODUCTION_ENV"
 
       - name: Cek situs hidup
         run: |
