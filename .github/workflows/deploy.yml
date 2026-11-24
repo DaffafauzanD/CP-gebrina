@@ -13,9 +13,9 @@
 # tidak pernah ditimpa oleh public/index.php dari repo. .env dan storage/ di
 # server juga tidak pernah disentuh.
 #
-# Upload memakai catatan hash (.ftp-deploy-sync-state.json) di server, jadi
-# hanya file yang berubah yang dikirim. Deploy pertama mengirim semua file
-# (termasuk vendor/) dan butuh waktu lebih lama.
+# Upload memakai lftp lewat FTPS. vendor/ hanya dikirim ulang kalau
+# composer.lock berubah, jadi deploy biasa cukup cepat. Deploy pertama
+# mengirim seluruh vendor/ dan butuh waktu lebih lama.
 #
 # Secrets di GitHub > Settings > Secrets and variables > Actions:
 #   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   (wajib)
@@ -103,44 +103,57 @@ jobs:
           curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" --list-only "ftp://$FTP_SERVER/" || true
           exit 1
 
-      # Aset publik diupload lebih dulu supaya file build baru sudah ada saat
-      # kode baru mulai merujuknya lewat manifest Vite.
-      - name: Upload aset publik (public_html)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          security: loose
-          local-dir: ./public/
-          server-dir: ${{ steps.paths.outputs.base }}public_html/
-          exclude: |
-            index.php
+      # lftp dipakai (bukan action FTP berbasis Node) karena server FTP Hostinger
+      # mewajibkan TLS session reuse di koneksi data; tanpa itu muncul error
+      # "425 Unable to build data connection".
+      - name: Pasang lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 
-      - name: Upload kode aplikasi
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          security: loose
-          local-dir: ./
-          server-dir: ${{ steps.paths.outputs.base }}laravel/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            .github/**
-            .claude/**
-            .ai/**
-            node_modules/**
-            tests/**
-            scratch/**
-            public/**
-            storage/**
-            .env
-            .env.*
+      # Urutan upload:
+      #   1. public/ -> public_html  (aset build baru tersedia lebih dulu)
+      #   2. vendor/ hanya kalau composer.lock berubah (dicatat lewat hash)
+      #   3. kode aplikasi (kecil, selalu diupload penuh)
+      - name: Upload ke Hostinger
+        env:
+          BASE: ${{ steps.paths.outputs.base }}
+        run: |
+          set -euo pipefail
+          lock_hash=$(sha256sum composer.lock | cut -c1-64)
+          remote_hash=$(curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD"             "ftp://$FTP_SERVER/${BASE}laravel/vendor/.composer-lock-hash" || true)
+
+          if [ "$lock_hash" = "$remote_hash" ]; then
+            echo "composer.lock tidak berubah, vendor/ dilewati"
+            vendor_cmd=""
+          else
+            echo "composer.lock berubah, vendor/ diupload ulang"
+            echo "$lock_hash" > vendor/.composer-lock-hash
+            vendor_cmd="mirror -R --delete --parallel=8 vendor ${BASE}laravel/vendor"
+          fi
+
+          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_SERVER" <<LFTP
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate no
+          set net:max-retries 3
+          set net:timeout 30
+          set cmd:fail-exit true
+
+          mirror -R --parallel=8 --exclude-glob index.php --exclude-glob build/ public ${BASE}public_html
+          mirror -R --delete --parallel=8 public/build ${BASE}public_html/build
+
+          $vendor_cmd
+
+          mirror -R --delete --parallel=8 app ${BASE}laravel/app
+          mirror -R --delete --parallel=8 config ${BASE}laravel/config
+          mirror -R --delete --parallel=8 database ${BASE}laravel/database
+          mirror -R --delete --parallel=8 resources ${BASE}laravel/resources
+          mirror -R --delete --parallel=8 routes ${BASE}laravel/routes
+          mirror -R --parallel=8 bootstrap ${BASE}laravel/bootstrap
+          put -O ${BASE}laravel artisan
+          put -O ${BASE}laravel composer.json
+          put -O ${BASE}laravel composer.lock
+          bye
+          LFTP
 
       - name: Perbarui .env produksi (opsional)
         env:
